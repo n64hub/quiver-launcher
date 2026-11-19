@@ -99,7 +99,7 @@ test("a file no maintainer ticked asks before it installs, and is offered at onc
   }
 });
 
-test("a file held back while its virus scan runs says so, and so does the question before it installs", async () => {
+test("a file Quiver doesn't offer whose virus scan isn't finished says so, and so does the question before it installs", async () => {
   const s = await open(process.env.SHOT_DIR && `${process.env.SHOT_DIR}/which-download-scan-pending.png`, SCAN_PENDING);
   try {
     const dialog = s.page.locator(".choose");
