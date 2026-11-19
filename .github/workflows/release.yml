@@ -205,10 +205,11 @@ jobs:
       - id: dist
         uses: actions/cache/restore@v4
         with: { path: ~/.cache/cef, key: "cef-${{ hashFiles('apps/launcher/src-tauri/Cargo.cef.lock') }}" }
-      # Ubuntu's mirror can crawl: apt-install.sh tries a stalled download again, and the step's limit stops one that
-      # stays stuck rather than holding the job.
+      # Ubuntu's mirror can crawl: apt-install.sh tries a stalled download again, and the step's limit, past the 18
+      # minutes its tries can take, stops one that stays stuck rather than holding the job. Not through the apt-install
+      # action: a release is built from what Ubuntu has now.
       - name: System libraries
-        timeout-minutes: 12
+        timeout-minutes: 20
         run: .github/apt-install.sh libdbus-1-dev libwebkit2gtk-4.1-dev librsvg2-dev libayatana-appindicator3-dev libudev-dev libfuse2 xvfb
       - name: The CEF build's tools
         timeout-minutes: 25

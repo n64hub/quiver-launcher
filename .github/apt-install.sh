@@ -28,11 +28,12 @@ fetch() {
 # lists and the packages earlier runs downloaded. When they're all this run needs, it installs from them and nothing
 # comes from the mirror. When they aren't (a package that's new, or one the runner's image has moved past), the rest
 # comes from the mirror as before, and what it got is kept, a download that stalled included, so the next run carries
-# on from there. It then leaves $APT_CACHE/.downloaded, for the action to save the folder again.
+# on from there. It then leaves $APT_CACHE/.downloaded, for the action to save the folder again. Packages with no lists
+# (the action's last month's) only spare their download.
 cache=${APT_CACHE:-}
+if [ -n "$cache" ] && [ -d "$cache/archives" ]; then sudo cp -r "$cache/archives/." /var/cache/apt/archives/; fi
 if [ -n "$cache" ] && [ -d "$cache/lists" ]; then
   sudo cp -r "$cache/lists/." /var/lib/apt/lists/
-  sudo cp -r "$cache/archives/." /var/cache/apt/archives/
   sudo "${apt[@]}" install -y --no-download "$@" && exit
   echo "::warning::What the cache kept wasn't all this run needs, so the rest comes from Ubuntu's mirror"
 fi

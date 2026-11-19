@@ -2,7 +2,9 @@
 # lists and the packages. A run that finds all it needs there installs from them and doesn't wait on Ubuntu's mirror at
 # all. They're kept for each Ubuntu release and list of packages, whichever image of it the runner has. A run that had
 # to download saves them again, a download that stalled included, so the next run carries on from there; the newest
-# save is the one restored.
+# save is the one restored. They're kept for each month too: the month's first run takes last month's packages but not
+# its lists, so it reads Ubuntu's current lists and downloads only what changed, rather than installing from an older
+# copy of Ubuntu month after month.
 name: Ubuntu packages
 description: Install Ubuntu packages, kept in GitHub's cache between runs
 inputs:
@@ -15,22 +17,33 @@ runs:
     - id: key
       shell: bash
       env: { PACKAGES: "${{ inputs.packages }}" }
-      run: echo "prefix=apt-$ImageOS-$(printf %s "$PACKAGES" | sha256sum | cut -c1-16)-" >> "$GITHUB_OUTPUT"
-    - uses: actions/cache/restore@v4
+      run: |
+        prefix="apt-$ImageOS-$(printf %s "$PACKAGES" | sha256sum | cut -c1-16)-"
+        echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+        echo "month=$prefix$(date -u +%Y-%m)-" >> "$GITHUB_OUTPUT"
+    - id: restore
+      uses: actions/cache/restore@v4
       with:
         path: ~/.cache/apt
-        key: "${{ steps.key.outputs.prefix }}${{ github.run_id }}"
-        restore-keys: "${{ steps.key.outputs.prefix }}"
+        key: "${{ steps.key.outputs.month }}"
+        restore-keys: |
+          ${{ steps.key.outputs.month }}
+          ${{ steps.key.outputs.prefix }}
     - id: install
       shell: bash
-      env: { PACKAGES: "${{ inputs.packages }}" }
+      env:
+        PACKAGES: "${{ inputs.packages }}"
+        MONTH: "${{ steps.key.outputs.month }}"
+        RESTORED: "${{ steps.restore.outputs.cache-matched-key }}"
       # $PACKAGES unquoted: one word each.
       run: |
         rm -f ~/.cache/apt/.downloaded
+        # Last month's: its packages, not its lists.
+        if [ -n "$RESTORED" ] && [[ "$RESTORED" != "$MONTH"* ]]; then rm -rf ~/.cache/apt/lists; fi
         status=0
         APT_CACHE=~/.cache/apt "$GITHUB_WORKSPACE/.github/apt-install.sh" $PACKAGES || status=$?
         if [ -e ~/.cache/apt/.downloaded ]; then echo "save=true" >> "$GITHUB_OUTPUT"; fi
         exit "$status"
     - if: always() && steps.install.outputs.save == 'true'
       uses: actions/cache/save@v4
-      with: { path: ~/.cache/apt, key: "${{ steps.key.outputs.prefix }}${{ github.run_id }}-${{ github.run_attempt }}" }
+      with: { path: ~/.cache/apt, key: "${{ steps.key.outputs.month }}${{ github.run_id }}-${{ github.run_attempt }}" }
