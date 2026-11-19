@@ -4842,6 +4842,10 @@ msgid "Quiver doesn't know where this app saves yet. Play it once, or choose the
 msgstr "Quiver doesn't know where this app saves yet. Play it once, or choose the folder."
 
 #: ../../apps/launcher/src/App.tsx
+msgid "Quiver doesn't offer {name} for {app} yet: its virus scan hasn't finished."
+msgstr "Quiver doesn't offer {name} for {app} yet: its virus scan hasn't finished."
+
+#: ../../apps/launcher/src/App.tsx
 msgid "Quiver doesn't offer {name} for {app}: it may be for another system, or missed when the downloads were picked."
 msgstr "Quiver doesn't offer {name} for {app}: it may be for another system, or missed when the downloads were picked."
 
@@ -6914,6 +6918,11 @@ msgstr "View options"
 #: ../../apps/launcher/src/card-menu.tsx
 msgid "View repository"
 msgstr "View repository"
+
+#. A release file Quiver doesn't offer while its virus scan runs, in Which download?'s Show all files
+#: ../../apps/launcher/src/App.tsx
+msgid "Virus scan not finished"
+msgstr "Virus scan not finished"
 
 #: ../../apps/launcher/src/detail.tsx
 msgid "VirusTotal hasn't cleared this release, so installing it asks you to confirm first."

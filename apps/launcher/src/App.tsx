@@ -2748,7 +2748,14 @@ function ChooseFileDialog({ choice }: { choice: Choice }) {
       <strong>
         {a.os === "unknown" ? t`Platform unspecified` : (OS_NAMES[a.os] ?? a.os)}
         {a.architecture !== "unknown" ? ` · ${a.architecture}` : ""}
-        {unapproved.has(a.id) ? ` · ${t({ message: "Not approved", comment: "A release file a maintainer didn't tick for the app, in Which download?'s Show all files" })}` : ""}
+        {unapproved.has(a.id)
+          ? ` · ${
+              // Quiver holds a file back until its virus scan is done: that's why, not that nobody approved it.
+              a.scan?.verdict === "pending"
+                ? t({ message: "Virus scan not finished", comment: "A release file Quiver doesn't offer while its virus scan runs, in Which download?'s Show all files" })
+                : t({ message: "Not approved", comment: "A release file a maintainer didn't tick for the app, in Which download?'s Show all files" })
+            }`
+          : ""}
       </strong>
       <small>{a.filename}</small>
     </span>
@@ -2797,7 +2804,7 @@ function ChooseFileDialog({ choice }: { choice: Choice }) {
                 <Trans>Show all files</Trans>
               </button>
             ))}
-          {(showAll ? choice.unapproved.length > 0 : choice.assets.some((a) => unapproved.has(a.id))) && <SuggestPlatform choice={choice} files={[...choice.assets, ...rest]} />}
+          {showAll && choice.unapproved.length > 0 && <SuggestPlatform choice={choice} files={[...choice.assets, ...rest]} />}
           <button onClick={() => choice.resolve(null)}>
             <Trans>Cancel</Trans>
           </button>
@@ -2816,8 +2823,7 @@ function SuggestPlatform({ choice, files }: { choice: Choice; files: Asset[] }) 
   const { config, installs } = useLauncher();
   const { user, suggestCorrection } = useAccount();
   const [open, setOpen] = useState(false);
-  // The first one listed that a maintainer didn't tick: the one for this computer, when there is one.
-  const [file, setFile] = useState(files.find((a) => choice.unapproved.includes(a.id))?.id ?? choice.unapproved[0]);
+  const [file, setFile] = useState(choice.unapproved[0]);
   const [os, setOs] = useState<string>(config.os in OS_NAMES ? config.os : "windows");
   const [state, setState] = useState<"busy" | "sent" | { error: string }>();
   if (!user)
@@ -2949,7 +2955,9 @@ function UnverifiedPrompt() {
                 ? t`Apps are set to update to the newest release right away, and ${release} is the newest. Quiver Launcher is asking in this case because of its virus scan.`
                 : `${early ? "" : `${t`Quiver doesn't offer a release of ${app} yet.`} `}${t`Quiver Launcher isn't offering this release as an update yet.`}`
             : unapproved
-              ? t`Quiver doesn't offer ${name} for ${app}: it may be for another system, or missed when the downloads were picked.`
+              ? scan?.verdict === "pending"
+                ? t`Quiver doesn't offer ${name} for ${app} yet: its virus scan hasn't finished.`
+                : t`Quiver doesn't offer ${name} for ${app}: it may be for another system, or missed when the downloads were picked.`
               : unchecked
                 ? t`Quiver checked ${release}'s other files, not ${name}. It downloads as the developer published it.`
                 : t`${name} changed after ${release} finished its 48-hour wait, and the new file hasn't been out for 48 hours yet. It installs the file Quiver saw, and refuses one that changed since.`}

@@ -2183,10 +2183,7 @@ function LauncherState({ saved, children }: { saved: Saved; children: ReactNode 
         if (auto) return waitForPlayer();
         unapproved = stray || custom ? [] : ofKind(release.otherAssets ?? (await otherFilesOf(entry.slug, release.version)));
         if (!asset && !unapproved.length) throw new Problem(msg`This release has no download for your computer.`);
-        // None marked for this computer, but one a maintainer didn't tick is: that one first, as the one likeliest to
-        // run, rather than behind Show all files. It still says it isn't approved, and asks before it installs.
-        const forHere = unmatched ? bestAssets(unapproved, config.os, config.arch, undefined, kind, platform) : [];
-        const choices = [...forHere, ...(asset ? [asset, ...others] : [])];
+        const choices = asset ? [asset, ...others] : [];
         const all = [...approved, ...unapproved];
         const picked = await new Promise<Asset | null>((resolve) => setChoice({ entry, version: release.version, assets: choices, all, unapproved: unapproved.map((a) => a.id), unmatched, resolve }));
         setChoice(null);
@@ -2208,7 +2205,9 @@ function LauncherState({ saved, children }: { saved: Saved; children: ReactNode 
       if (why === "changed" && auto && newestRightAway) unverified = true;
       else if (why) {
         if (auto) return waitForPlayer(asset.checkEndsAt ?? Infinity);
-        if (!(await ask({ entry, version: release.version, file: { name: asset.filename, why }, reasons: [], checkEndsAt: why === "unapproved" ? undefined : asset.checkEndsAt }))) return stop("unverified_prompt");
+        // One a maintainer didn't tick with its own scan: the scan, as the site may be holding it back until that's done.
+        const scan = why === "unapproved" ? asset.scan : undefined;
+        if (!(await ask({ entry, version: release.version, file: { name: asset.filename, why }, reasons: [], scan, checkEndsAt: why === "unapproved" ? undefined : asset.checkEndsAt }))) return stop("unverified_prompt");
         unverified = true;
       }
       format = installFormat(asset.filename);

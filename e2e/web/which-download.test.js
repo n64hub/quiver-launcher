@@ -1,8 +1,7 @@
 /**
  * Which download?: files the site put on no platform (a PS5 or Switch build) aren't files for this computer, so
  * several of them ask as files none of which is marked for it; and Show all files offers the release's others, the
- * ones a maintainer didn't tick too, which ask before they install. One a maintainer didn't tick that is for this
- * computer, when no ticked one is, comes first, without Show all files.
+ * ones a maintainer didn't tick too, which ask before they install.
  */
 import { after, test } from "node:test";
 import assert from "node:assert/strict";
@@ -23,11 +22,16 @@ const RELEASE = {
 };
 // Only the Windows build that wasn't ticked is one Windows can install: Show all files is open from the start.
 const ONLY_UNTICKED = { ...RELEASE, assets: files(["Port-android.apk", "android"]) };
-// As Darkwatch: Darker Edition's v0.8.1 reached the launcher: only the Linux build ticked, the Windows one not.
-const LINUX_TICKED = {
+// As Darkwatch: Darker Edition v0.8.1 reached the launcher: the Linux build ticked, the Windows one held back while
+// its virus scan runs.
+const SCAN_PENDING = {
   ...RELEASE,
   assets: files(["Port-linux-x64.tar.gz", "linux"]),
-  otherAssets: files(["Port-source.zip", "unknown"], ["Port-windows-x64.zip", "windows"], ["SHA256SUMS.txt", "unknown"]).map(({ checksum, ...a }) => ({ ...a, unverifiedChecksum: checksum })),
+  otherAssets: files(["Port-windows-x64.zip", "windows"]).map(({ checksum, ...a }) => ({
+    ...a,
+    unverifiedChecksum: checksum,
+    scan: { verdict: "pending", url: "https://www.virustotal.com/gui/file/aaaa" },
+  })),
 };
 
 const open = (path, release = RELEASE, signIn = false) =>
@@ -64,12 +68,11 @@ test("files on no platform ask as none marked for this computer, and Show all fi
     const dialog = s.page.locator(".choose");
     assert.match(await dialog.innerText(), /None of .* files are marked for your computer/);
     const choices = dialog.locator(".choices button");
-    // The Windows build no maintainer ticked comes first, said so, as no ticked file is for Windows.
-    assert.equal(await choices.count(), 3);
-    assert.match(await choices.first().innerText(), /Windows · Not approved\s+Port-windows-x64\.zip/);
+    assert.equal(await choices.count(), 2);
     await dialog.getByRole("button", { name: "Show all files" }).click();
-    // The Android app isn't one Windows can install.
+    // The Android app isn't one Windows can install; the Windows build no maintainer ticked is there, said so.
     assert.equal(await choices.count(), 4);
+    assert.match(await choices.filter({ hasText: "Port-windows-x64.zip" }).innerText(), /Not approved/);
     assert.equal(await dialog.getByText("Port-android.apk").count(), 0);
     if (process.env.SHOT_DIR) await dialog.screenshot({ path: `${process.env.SHOT_DIR}/which-download-all.png` });
     await choices.filter({ hasText: "Port-macos.zip" }).click();
@@ -96,19 +99,21 @@ test("a file no maintainer ticked asks before it installs, and is offered at onc
   }
 });
 
-test("when only another system's build is ticked, the one for this computer that isn't comes first, and asks", async () => {
-  const s = await open(process.env.SHOT_DIR && `${process.env.SHOT_DIR}/which-download-other-system.png`, LINUX_TICKED);
+test("a file held back while its virus scan runs says so, and so does the question before it installs", async () => {
+  const s = await open(process.env.SHOT_DIR && `${process.env.SHOT_DIR}/which-download-scan-pending.png`, SCAN_PENDING);
   try {
     const dialog = s.page.locator(".choose");
-    const choices = dialog.locator(".choices button");
-    assert.deepEqual(
-      (await choices.allInnerTexts()).map((text) => text.trim().replace(/\s+/g, " ")),
-      ["Windows · Not approved Port-windows-x64.zip", "Linux Port-linux-x64.tar.gz"],
-    );
-    await choices.first().click();
+    await dialog.getByRole("button", { name: "Show all files" }).click();
+    const file = dialog.locator(".choices button").filter({ hasText: "Port-windows-x64.zip" });
+    assert.match(await file.innerText(), /Windows · Virus scan not finished/);
+    assert.doesNotMatch(await file.innerText(), /Not approved/);
+    if (process.env.SHOT_DIR) await dialog.screenshot({ path: `${process.env.SHOT_DIR}/which-download-scan-pending-all.png` });
+    await file.click();
     const prompt = s.page.locator(".unverified-prompt");
     await prompt.waitFor();
-    assert.match(await prompt.innerText(), /Install a file Quiver doesn't offer\?/);
+    assert.match(await prompt.innerText(), /Quiver doesn't offer Port-windows-x64\.zip for .* yet: its virus scan hasn't finished\./);
+    assert.match(await prompt.innerText(), /VirusTotal: still scanning its files\./);
+    if (process.env.SHOT_DIR) await prompt.screenshot({ path: `${process.env.SHOT_DIR}/which-download-scan-pending-ask.png` });
     await prompt.getByRole("button", { name: "Install anyway" }).click();
     assert.equal(await installedFile(s), "Port-windows-x64.zip");
   } finally {
