@@ -4843,8 +4843,8 @@ msgid "Quiver doesn't know where this app saves yet. Play it once, or choose the
 msgstr "Quiver가 아직 이 앱의 저장 위치를 모릅니다. 한 번 플레이하거나 폴더를 선택하세요."
 
 #: ../../apps/launcher/src/App.tsx
-msgid "Quiver doesn't offer {name} for {app} yet: its virus scan hasn't finished."
-msgstr "Quiver는 아직 {app}에 {name} 파일을 제공하지 않아요. 바이러스 검사가 끝나지 않았어요."
+msgid "Quiver doesn't offer {name} for {app}, and its virus scan hasn't finished."
+msgstr "Quiver는 {app}에 {name} 파일을 제공하지 않고, 바이러스 검사도 끝나지 않았어요."
 
 #: ../../apps/launcher/src/App.tsx
 msgid "Quiver doesn't offer {name} for {app}: it may be for another system, or missed when the downloads were picked."

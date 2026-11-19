@@ -2750,7 +2750,7 @@ function ChooseFileDialog({ choice }: { choice: Choice }) {
         {a.architecture !== "unknown" ? ` · ${a.architecture}` : ""}
         {unapproved.has(a.id)
           ? ` · ${
-              // Quiver holds a file back until its virus scan is done: that's why, not that nobody approved it.
+              // Its scan isn't done, which says more than "Not approved": most files the site leaves out are waiting on theirs.
               a.scan?.verdict === "pending"
                 ? t({ message: "Virus scan not finished", comment: "A release file Quiver doesn't offer while its virus scan runs, in Which download?'s Show all files" })
                 : t({ message: "Not approved", comment: "A release file a maintainer didn't tick for the app, in Which download?'s Show all files" })
@@ -2956,7 +2956,7 @@ function UnverifiedPrompt() {
                 : `${early ? "" : `${t`Quiver doesn't offer a release of ${app} yet.`} `}${t`Quiver Launcher isn't offering this release as an update yet.`}`
             : unapproved
               ? scan?.verdict === "pending"
-                ? t`Quiver doesn't offer ${name} for ${app} yet: its virus scan hasn't finished.`
+                ? t`Quiver doesn't offer ${name} for ${app}, and its virus scan hasn't finished.`
                 : t`Quiver doesn't offer ${name} for ${app}: it may be for another system, or missed when the downloads were picked.`
               : unchecked
                 ? t`Quiver checked ${release}'s other files, not ${name}. It downloads as the developer published it.`

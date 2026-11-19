@@ -22,8 +22,8 @@ const RELEASE = {
 };
 // Only the Windows build that wasn't ticked is one Windows can install: Show all files is open from the start.
 const ONLY_UNTICKED = { ...RELEASE, assets: files(["Port-android.apk", "android"]) };
-// As Darkwatch: Darker Edition v0.8.1 reached the launcher: the Linux build ticked, the Windows one held back while
-// its virus scan runs.
+// As Darkwatch: Darker Edition v0.8.1 reached the launcher: the Linux build ticked, the Windows one not, its virus
+// scan not finished.
 const SCAN_PENDING = {
   ...RELEASE,
   assets: files(["Port-linux-x64.tar.gz", "linux"]),
@@ -111,7 +111,7 @@ test("a file held back while its virus scan runs says so, and so does the questi
     await file.click();
     const prompt = s.page.locator(".unverified-prompt");
     await prompt.waitFor();
-    assert.match(await prompt.innerText(), /Quiver doesn't offer Port-windows-x64\.zip for .* yet: its virus scan hasn't finished\./);
+    assert.match(await prompt.innerText(), /Quiver doesn't offer Port-windows-x64\.zip for .*, and its virus scan hasn't finished\./);
     assert.match(await prompt.innerText(), /VirusTotal: still scanning its files\./);
     if (process.env.SHOT_DIR) await prompt.screenshot({ path: `${process.env.SHOT_DIR}/which-download-scan-pending-ask.png` });
     await prompt.getByRole("button", { name: "Install anyway" }).click();

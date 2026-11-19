@@ -4843,8 +4843,8 @@ msgid "Quiver doesn't know where this app saves yet. Play it once, or choose the
 msgstr "Quiver ne sait pas encore où cette app enregistre ses sauvegardes. Lancez-la une fois, ou choisissez le dossier."
 
 #: ../../apps/launcher/src/App.tsx
-msgid "Quiver doesn't offer {name} for {app} yet: its virus scan hasn't finished."
-msgstr "Quiver ne propose pas encore {name} pour {app} : son analyse antivirus n'est pas terminée."
+msgid "Quiver doesn't offer {name} for {app}, and its virus scan hasn't finished."
+msgstr "Quiver ne propose pas {name} pour {app}, et son analyse antivirus n'est pas terminée."
 
 #: ../../apps/launcher/src/App.tsx
 msgid "Quiver doesn't offer {name} for {app}: it may be for another system, or missed when the downloads were picked."
