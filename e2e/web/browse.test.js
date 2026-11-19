@@ -197,8 +197,11 @@ test("a console shelf's See all puts its maker on the console filter, in place o
 test("Refresh asks the catalog again for the same search, by the d-pad, and keeps the search", async () => {
   assert.equal(await open("button", { text: "Browse" }), "main");
   const search = page.getByRole("textbox", { name: "Search the catalog" });
+  // The search's own page in first: it comes a moment after the typing.
+  const searched = page.waitForResponse((r) => new URL(r.url()).searchParams.get("search") === "port");
   await search.fill("port");
-  await page.locator('article[data-slug="tampered-port"]').waitFor();
+  await searched;
+  await page.locator(".browse-tools .refresh:not([aria-busy=true])").waitFor();
   const asked = [];
   const listen = (r) => new URL(r.url()).pathname.endsWith("/apps") && asked.push(new URL(r.url()).searchParams.get("search"));
   page.on("request", listen);
