@@ -2183,7 +2183,10 @@ function LauncherState({ saved, children }: { saved: Saved; children: ReactNode 
         if (auto) return waitForPlayer();
         unapproved = stray || custom ? [] : ofKind(release.otherAssets ?? (await otherFilesOf(entry.slug, release.version)));
         if (!asset && !unapproved.length) throw new Problem(msg`This release has no download for your computer.`);
-        const choices = asset ? [asset, ...others] : [];
+        // None marked for this computer, but one a maintainer didn't tick is: that one first, as the one likeliest to
+        // run, rather than behind Show all files. It still says it isn't approved, and asks before it installs.
+        const forHere = unmatched ? bestAssets(unapproved, config.os, config.arch, undefined, kind, platform) : [];
+        const choices = [...forHere, ...(asset ? [asset, ...others] : [])];
         const all = [...approved, ...unapproved];
         const picked = await new Promise<Asset | null>((resolve) => setChoice({ entry, version: release.version, assets: choices, all, unapproved: unapproved.map((a) => a.id), unmatched, resolve }));
         setChoice(null);

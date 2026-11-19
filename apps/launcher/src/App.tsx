@@ -2797,7 +2797,7 @@ function ChooseFileDialog({ choice }: { choice: Choice }) {
                 <Trans>Show all files</Trans>
               </button>
             ))}
-          {showAll && choice.unapproved.length > 0 && <SuggestPlatform choice={choice} files={[...choice.assets, ...rest]} />}
+          {(showAll ? choice.unapproved.length > 0 : choice.assets.some((a) => unapproved.has(a.id))) && <SuggestPlatform choice={choice} files={[...choice.assets, ...rest]} />}
           <button onClick={() => choice.resolve(null)}>
             <Trans>Cancel</Trans>
           </button>
@@ -2816,7 +2816,8 @@ function SuggestPlatform({ choice, files }: { choice: Choice; files: Asset[] }) 
   const { config, installs } = useLauncher();
   const { user, suggestCorrection } = useAccount();
   const [open, setOpen] = useState(false);
-  const [file, setFile] = useState(choice.unapproved[0]);
+  // The first one listed that a maintainer didn't tick: the one for this computer, when there is one.
+  const [file, setFile] = useState(files.find((a) => choice.unapproved.includes(a.id))?.id ?? choice.unapproved[0]);
   const [os, setOs] = useState<string>(config.os in OS_NAMES ? config.os : "windows");
   const [state, setState] = useState<"busy" | "sent" | { error: string }>();
   if (!user)
