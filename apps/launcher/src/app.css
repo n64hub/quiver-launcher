@@ -2559,7 +2559,7 @@ body:has(.tv-mode) .account-menu-name { display: block; }
 .old-pictures.compact .old-picture input { top: 11px; }
 
 /*
- * Selecting many library apps (library-ticking.tsx). While selecting, a card shows a tick over its picture and none of its buttons, as any click selects it; a selected one is
+ * Selecting many library apps, or Browse's (library-ticking.tsx). While selecting, a card shows a tick over its picture and none of its buttons, as any click selects it; a selected one is
  * ringed in the accent colour.
  */
 .tick-mark {
@@ -2573,9 +2573,11 @@ body:has(.tv-mode) .account-menu-name { display: block; }
 .tick-mark[data-ticked] { border-color: var(--accent); background: var(--accent); }
 .card-cover { position: relative; }
 [data-ticking] .library-tile[data-tick] .tile-overlay { display: none; }
-[data-ticking] .library-tile[data-tick] .card-open { cursor: pointer; }
-.library-tile[data-ticked] .card-cover { outline: 3px solid var(--accent); outline-offset: 3px; }
-.library-tile[data-ticked] .card-cover > :not(.tick-mark) { filter: brightness(0.8); }
+[data-ticking] .entry-card[data-tick] .card-open { cursor: pointer; }
+/* A Browse card's Get and menu: in their place, so the grid doesn't move. */
+[data-ticking] .entry-card[data-tick] > .card-action { visibility: hidden; }
+.entry-card[data-ticked] .card-cover { outline: 3px solid var(--accent); outline-offset: 3px; }
+.entry-card[data-ticked] .card-cover > :not(.tick-mark) { filter: brightness(0.8); }
 /* A sidebar row: the tick over its icon's corner, the row tinted. */
 .sidebar-row .tick-mark { position: static; flex: none; width: 18px; height: 18px; border: 1.5px solid var(--line-strong); background: none; box-shadow: none; }
 .sidebar-row .tick-mark[data-ticked] { border-color: var(--accent); background: var(--accent); }

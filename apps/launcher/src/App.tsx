@@ -53,6 +53,8 @@ import { SavesTab } from "./saves-tab";
 import { FilePicker } from "./file-picker";
 import { BrowseMenu, fileName } from "./card-menu";
 import { browseShown, hiddenMatches, toggleHidden, type HiddenView } from "./browse-hidden";
+import { TickArea, useTicked } from "./library-ticking";
+import { TickMark } from "./library-tile";
 import { closesOutside } from "./overlay";
 import { OwnCopyChips, OwnCopyPrompt } from "./own-copy-setup";
 import { copiesNeeded } from "./own-copy";
@@ -900,21 +902,24 @@ function BrowsePage({
               </h2>
             </>
           )}
-          <div className={looks.grid}>
-            {entries.map((entry) => (
-              <EntryCard
-                key={entry.id}
-                entry={withShownTags(entry)}
-                {...looks.card(entry)}
-                // A download's progress, or what went wrong, shows over the art without hover.
-                className={jobs[entry.id] ? "busy" : undefined}
-                consoleNames={consoleNames}
-                onOpen={() => onOpen(entry)}
-                badge={hidden.has(entry.id) ? t`Hidden` : inLibrary.has(entry.id) ? t`In library` : undefined}
-                action={<BrowseAction entry={entry} onOpen={onOpen} />}
-              />
-            ))}
-          </div>
+          {/* Ctrl+click or Shift+click selects many, to add or hide them together (library-ticking.tsx). */}
+          <TickArea shown={entries.map((e) => e.id)} browse={all}>
+            <div className={looks.grid}>
+              {entries.map((entry) => (
+                <BrowseCard
+                  key={entry.id}
+                  entry={withShownTags(entry)}
+                  {...looks.card(entry)}
+                  // A download's progress, or what went wrong, shows over the art without hover.
+                  className={jobs[entry.id] ? "busy" : undefined}
+                  consoleNames={consoleNames}
+                  onOpen={() => onOpen(entry)}
+                  badge={hidden.has(entry.id) ? t`Hidden` : inLibrary.has(entry.id) ? t`In library` : undefined}
+                  action={<BrowseAction entry={entry} onOpen={onOpen} />}
+                />
+              ))}
+            </div>
+          </TickArea>
           {/* Or apps came, and none of them is for here, with no note below to say why: Only hidden apps, with none in these filters. */}
           {!waiting && (!all.length || (!entries.length && !left && !hiddenLeft && last?.isDone)) && (
             <p className="empty">
@@ -980,6 +985,13 @@ function ShowMore({ onMore }: { onMore: () => void }) {
       </button>
     </div>
   );
+}
+
+/** A Browse card, with a tick over its cover while apps are being selected there. */
+function BrowseCard(props: Parameters<typeof EntryCard>[0] & { entry: Entry }) {
+  const { id } = props.entry;
+  const { ticking, ticked } = useTicked([id]);
+  return <EntryCard {...props} tick={{ id, ticked, mark: ticking && <TickMark ticked={ticked} /> }} />;
 }
 
 /** A Browse card's button, and the menu its card opens (a right-click, a long press): its repository, README and feedback, and hiding it. */

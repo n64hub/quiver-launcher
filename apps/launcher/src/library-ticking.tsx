@@ -11,15 +11,19 @@
  *
  * Cards and rows say which apps they are with `data-tick` (a game's card: its ports in the library, space apart);
  * the page takes their clicks first, so they need nothing more than `useTicked` to show a tick.
+ *
+ * Browse's cards are selected the same way, with Browse's own bar: adding them to the library, and hiding them from
+ * Browse or showing them there again.
  */
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Check, ChevronDown, EyeOff, ListPlus, Minus, MoreHorizontal, Tag, Trash2, X } from "lucide-react";
+import { Check, ChevronDown, Eye, EyeOff, ListPlus, Minus, MoreHorizontal, Plus, Tag, Trash2, X } from "lucide-react";
 import { plural, t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import type { Entry } from "@quiverlauncher/api";
 import { PORTABLE_FILE, canGet, hasUpdate, pulledVerified, updatesByItself, useLauncher, type Install } from "./store";
 import { Dialog, Popover, newKey } from "./library";
 import { menuArrows } from "./card-menu";
+import { withHiddenApps } from "./browse-hidden";
 import { tickRange, tickState, tickToggled, withIds, withOwnTag, type TickState } from "./ticking";
 import { native } from "./native";
 import { track } from "./telemetry";
@@ -44,14 +48,15 @@ const OVER = '[role="dialog"], [role="menu"], [role="listbox"], .menu.floating, 
 /**
  * Around the library's apps: takes clicks on its cards and rows first while selecting (or with Ctrl or Shift), and
  * shows the bar along its foot. `shown`: the apps showing, by tab, search and filters, which Select all selects;
- * `playlist`, the open one of the player's own, whose apps picked by hand can come off it.
+ * `playlist`, the open one of the player's own, whose apps picked by hand can come off it. `browse`: Browse's apps,
+ * those its pages brought, selected there in place of the library's.
  */
-export function TickArea({ shown, playlist, children }: { shown: readonly string[]; playlist?: string; children: ReactNode }) {
+export function TickArea({ shown, playlist, browse, children }: { shown: readonly string[]; playlist?: string; browse?: readonly Entry[]; children: ReactNode }) {
   const { library } = useLauncher();
   const [all, setTicked] = useState<ReadonlySet<string>>(new Set());
-  // Only apps still in the library: one removed meanwhile drops out.
-  const inLibrary = new Set(library.map((i) => i.id));
-  const ticked = [...all].some((id) => !inLibrary.has(id)) ? new Set([...all].filter((id) => inLibrary.has(id))) : all;
+  // Only apps still in the library (or Browse): one removed meanwhile, or no longer in Browse's search, drops out.
+  const there = new Set(browse ? browse.map((e) => e.id) : library.map((i) => i.id));
+  const ticked = [...all].some((id) => !there.has(id)) ? new Set([...all].filter((id) => there.has(id))) : all;
   const ticking = ticked.size > 0;
   // The card clicked last, which Shift+click selects from.
   const anchor = useRef<string>(undefined);
@@ -132,7 +137,12 @@ export function TickArea({ shown, playlist, children }: { shown: readonly string
     <TickContext.Provider value={tick}>
       {children}
       {ticking && <div className="tick-space" aria-hidden="true" />}
-      {ticking && <TickBar ids={[...ticked]} shown={shown} playlist={playlist} menu={menu} onSelectAll={() => setTicked((t) => new Set([...t, ...shown]))} onDone={() => setTicked(new Set())} />}
+      {ticking &&
+        (browse ? (
+          <BrowseTickBar entries={browse.filter((e) => ticked.has(e.id))} shown={shown} menu={menu} onSelectAll={() => setTicked((t) => new Set([...t, ...shown]))} onDone={() => setTicked(new Set())} />
+        ) : (
+          <TickBar ids={[...ticked]} shown={shown} playlist={playlist} menu={menu} onSelectAll={() => setTicked((t) => new Set([...t, ...shown]))} onDone={() => setTicked(new Set())} />
+        ))}
     </TickContext.Provider>
   );
 }
@@ -154,24 +164,11 @@ function TickBar({
   onDone: () => void;
 }) {
   const [uninstalling, setUninstalling] = useState<"uninstall" | "remove" | null>(null);
-  const count = ids.length;
-  const away = ids.filter((id) => !shown.includes(id)).length;
   const items = (part: Part) => (close: () => void) => <TickedItems ids={ids} part={part} playlist={playlist} close={close} onDone={onDone} onUninstall={setUninstalling} />;
   return (
     <>
     <div className="tick-bar" role="toolbar" aria-label={t`Selected apps`}>
-      <button type="button" className="icon" aria-label={t`Stop selecting`} title={t`Stop selecting`} onClick={onDone}>
-        <X size={16} />
-      </button>
-      <span className="tick-count" aria-live="polite">
-        {plural(count, { one: "# selected", other: "# selected" })}
-        {away > 0 && <span className="muted"> {plural(away, { one: "(# not showing)", other: "(# not showing)" })}</span>}
-      </span>
-      {shown.some((id) => !ids.includes(id)) && (
-        <button type="button" className="text-button" onClick={onSelectAll}>
-          <Trans comment="Selects every app the library shows">Select all</Trans>
-        </button>
-      )}
+      <TickCount ids={ids} shown={shown} onSelectAll={onSelectAll} onDone={onDone} />
       <span className="tick-actions">
         <Popover label={t`Add to playlist`} icon={<><ListPlus size={15} /> <span className="tool-label">{t({ message: "Playlists", comment: "Button over the selected apps: puts them on playlists" })}</span> <ChevronDown size={13} aria-hidden="true" /></>} role="menu" up className="tool tick-part" panel="card-menu-panel">
           {items("playlists")}
@@ -200,6 +197,124 @@ function TickBar({
       {uninstalling && <UninstallTicked ids={ids} remove={uninstalling === "remove"} onClose={() => setUninstalling(null)} onDone={onDone} />}
     </>
   );
+}
+
+/** The start of a bar of selected apps: Stop selecting, how many (and how many of them don't show), and Select all. */
+function TickCount({ ids, shown, onSelectAll, onDone }: { ids: readonly string[]; shown: readonly string[]; onSelectAll: () => void; onDone: () => void }) {
+  const count = ids.length;
+  const away = ids.filter((id) => !shown.includes(id)).length;
+  return (
+    <>
+      <button type="button" className="icon" aria-label={t`Stop selecting`} title={t`Stop selecting`} onClick={onDone}>
+        <X size={16} />
+      </button>
+      <span className="tick-count" aria-live="polite">
+        {plural(count, { one: "# selected", other: "# selected" })}
+        {away > 0 && <span className="muted"> {plural(away, { one: "(# not showing)", other: "(# not showing)" })}</span>}
+      </span>
+      {shown.some((id) => !ids.includes(id)) && (
+        <button type="button" className="text-button" onClick={onSelectAll}>
+          <Trans comment="Selects every app the library shows">Select all</Trans>
+        </button>
+      )}
+    </>
+  );
+}
+
+/**
+ * Browse's bar while apps are selected there: how many, Select all and Done, adding those not in the library to it, and
+ * hiding them from Browse, or showing them again where they all are hidden. A right-click or Options on a card has the
+ * same two.
+ */
+function BrowseTickBar({
+  entries,
+  shown,
+  menu,
+  onSelectAll,
+  onDone,
+}: {
+  entries: Entry[];
+  shown: readonly string[];
+  menu: { current: ((x: number, y: number) => void) | null };
+  onSelectAll: () => void;
+  onDone: () => void;
+}) {
+  const { add, hide, hidden } = useBrowseTicked(entries, onDone);
+  const ids = entries.map((e) => e.id);
+  const n = ids.length;
+  const addLabel = plural(add.count, { one: "Add # to library", other: "Add # to library" });
+  const hideLabel = hidden ? t`Show in Browse` : t`Hide from Browse`;
+  return (
+    <div className="tick-bar" role="toolbar" aria-label={t`Selected apps`}>
+      <TickCount ids={ids} shown={shown} onSelectAll={onSelectAll} onDone={onDone} />
+      <span className="tick-actions">
+        {add.count > 0 && (
+          <button type="button" className="tool" onClick={add.act}>
+            <Plus size={15} /> <span className="tool-label">{addLabel}</span>
+          </button>
+        )}
+        <button type="button" className="tool" onClick={hide}>
+          {hidden ? <Eye size={15} /> : <EyeOff size={15} />} <span className="tool-label">{hideLabel}</span>
+        </button>
+      </span>
+      <button type="button" className="primary tick-done" onClick={onDone}>
+        <Trans comment="Button: stops selecting apps in the library">Done</Trans>
+      </button>
+      {/* A right-click or Options on a card while selecting. */}
+      <Popover label={t`Selected apps`} icon={null} bare role="menu" opener={menu} panel="card-menu-panel">
+        {(close) => (
+          <div className="game-menu tick-menu" data-arrows="" onKeyDown={menuArrows}>
+            <div className="game-menu-heading">{plural(n, { one: "# app selected", other: "# apps selected" })}</div>
+            {add.count > 0 && (
+              <button type="button" role="menuitem" data-item onClick={() => (close(), add.act())}>
+                {addLabel}
+              </button>
+            )}
+            <button type="button" role="menuitem" data-item onClick={() => (close(), hide())}>
+              {hideLabel}
+            </button>
+          </div>
+        )}
+      </Popover>
+    </div>
+  );
+}
+
+/**
+ * What Browse's bar does to the apps selected there, as each one's card or menu does it for one, then stops selecting:
+ * adds those not in the library to it, or hides them all from Browse (shows them all, once they all are hidden), with
+ * Undo on the toast saying so, which puts back the ones that changed and selects them all again.
+ */
+function useBrowseTicked(entries: Entry[], onDone: () => void) {
+  const { library, settings, setSettings, setNotice, addToLibrary } = useLauncher();
+  const select = useContext(TickContext)?.select;
+  const isHidden = (id: string) => Boolean(settings.browseHidden?.some((h) => h.id === id));
+  const hidden = tickState(entries.map((e) => e.id), isHidden) === "all";
+  const adding = entries.filter((e) => !library.some((i) => i.id === e.id));
+  const did = (action: string, apps: number) => track("browse_bulk_edit", { action, apps });
+  const add = () => {
+    for (const entry of adding) addToLibrary(entry);
+    // One toast for them all, in place of each one's.
+    setNotice(plural(adding.length, { one: "# app added to your library.", other: "# apps added to your library." }));
+    did("add", adding.length);
+    onDone();
+  };
+  const hide = () => {
+    const ids = entries.map((e) => e.id);
+    const changed = entries.filter((e) => isHidden(e.id) === hidden);
+    setSettings((s) => ({ ...s, browseHidden: withHiddenApps(s.browseHidden, entries, !hidden) }));
+    const undo = () => {
+      setSettings((s) => ({ ...s, browseHidden: withHiddenApps(s.browseHidden, changed, hidden) }));
+      select?.(ids);
+      did("undo-" + (hidden ? "show" : "hide"), changed.length);
+    };
+    setNotice(hidden ? plural(ids.length, { one: "# app shows in Browse again.", other: "# apps show in Browse again." }) : plural(ids.length, { one: "# app hidden from Browse.", other: "# apps hidden from Browse." }), {
+      action: { label: t({ message: "Undo", comment: "Button on the toast after hiding apps: shows them again, selected" }), act: undo },
+    });
+    did(hidden ? "show" : "hide", ids.length);
+    onDone();
+  };
+  return { add: { count: adding.length, act: add }, hide, hidden };
 }
 
 /** Hides the selected apps from the library, or shows them again where they all are hidden (the Hidden tab). */

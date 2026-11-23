@@ -195,7 +195,7 @@ const HiddenMark = () => (
 );
 
 /** Over the picture while the library is selecting: ticked or not. */
-const TickMark = ({ ticked }: { ticked: boolean }) => <span className="tick-mark" data-ticked={ticked || undefined} aria-hidden="true">{ticked && <Check size={16} strokeWidth={3} />}</span>;
+export const TickMark = ({ ticked }: { ticked: boolean }) => <span className="tick-mark" data-ticked={ticked || undefined} aria-hidden="true">{ticked && <Check size={16} strokeWidth={3} />}</span>;
 
 const Tile = memo(function Tile({
   entry,

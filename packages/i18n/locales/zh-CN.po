@@ -17,10 +17,20 @@ msgstr "“运行良好”是表示运行良好的玩家所占的比例。"
 msgid "(changed)"
 msgstr "（已更改）"
 
+#. placeholder {0}: adding.length
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {# app added to your library.} other {# apps added to your library.}}"
+msgstr "{0, plural, other {已将 # 个应用添加到游戏库。}}"
+
 #. placeholder {0}: elsewhere.size
 #: ../../apps/launcher/src/library.tsx
 msgid "{0, plural, one {# app for other platforms isn't shown.} other {# apps for other platforms aren't shown.}}"
 msgstr "{0, plural, one {其他平台还有 # 个应用未显示。} other {其他平台还有 # 个应用未显示。}}"
+
+#. placeholder {0}: ids.length
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {# app hidden from Browse.} other {# apps hidden from Browse.}}"
+msgstr "{0, plural, other {已从“浏览”中隐藏 # 个应用。}}"
 
 #. placeholder {0}: ids.length
 #: ../../apps/launcher/src/library-ticking.tsx
@@ -38,6 +48,11 @@ msgstr "{0, plural, other {还有 # 个应用在 {2} 中。新应用会装到新
 #: ../../apps/launcher/src/cache-page.tsx
 msgid "{0, plural, one {# app looked at} other {# apps looked at}}"
 msgstr "{0, plural, other {已查看 # 个应用}}"
+
+#. placeholder {0}: ids.length
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {# app shows in Browse again.} other {# apps show in Browse again.}}"
+msgstr "{0, plural, other {# 个应用重新显示在“浏览”中。}}"
 
 #. placeholder {0}: ids.length
 #: ../../apps/launcher/src/library-ticking.tsx
@@ -112,6 +127,11 @@ msgstr "{0, plural, other {其中 # 个可能把存档保存在自己的文件�
 #: ../../apps/launcher/src/library-ticking.tsx
 msgid "{0, plural, one {# of them may keep your saves in its folder. Uninstalling sends them to the trash too.} other {# of them may keep your saves in their folders. Uninstalling sends them to the trash too.}}"
 msgstr "{0, plural, other {其中 # 个应用可能把你的存档放在它们的文件夹里。卸载时存档也会一起移到回收站。}}"
+
+#. placeholder {0}: add.count
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {Add # to library} other {Add # to library}}"
+msgstr "{0, plural, other {将 # 个添加到游戏库}}"
 
 #. placeholder {0}: library.apps.length
 #: ../../apps/launcher/src/old-library.tsx
@@ -2696,6 +2716,7 @@ msgid "Don't play yet"
 msgstr "暂不游玩"
 
 #. Button: stops selecting apps in the library
+#. Button: stops selecting apps in the library
 #. Closes a dialog
 #. Closes the thanks after a problem was reported
 #: ../../apps/launcher/src/announcements-ui.tsx
@@ -3301,6 +3322,7 @@ msgstr "隐藏已忽略的项目"
 
 #: ../../apps/launcher/src/App.tsx
 #: ../../apps/launcher/src/card-menu.tsx
+#: ../../apps/launcher/src/library-ticking.tsx
 msgid "Hide from Browse"
 msgstr "从“浏览”中隐藏"
 
@@ -6327,6 +6349,7 @@ msgstr "查看哪些应用"
 #. Controller hint: what Confirm does on any other control
 #. Controller hint: what Confirm does on any other control
 #. Menu item: selects an app in the library, to change several at once
+#. Menu item: selects an app in the library, to change several at once
 #: ../../apps/launcher/src/card-menu.tsx
 #: ../../apps/launcher/src/spatial.ts
 msgid "Select"
@@ -6552,6 +6575,7 @@ msgstr "显示隐藏的应用"
 
 #: ../../apps/launcher/src/App.tsx
 #: ../../apps/launcher/src/card-menu.tsx
+#: ../../apps/launcher/src/library-ticking.tsx
 msgid "Show in Browse"
 msgstr "在“浏览”中显示"
 
@@ -7591,6 +7615,7 @@ msgid "Under a minute"
 msgstr "不到一分钟"
 
 #. Button on the toast after hiding apps: shows them again, selected
+#. Button on the toast after hiding apps: shows them again, selected
 #: ../../apps/launcher/src/library-ticking.tsx
 msgid "Undo"
 msgstr "撤销"
@@ -7657,6 +7682,7 @@ msgid "Unpin and install {version}"
 msgstr "取消固定并安装 {version}"
 
 #. Controller hint: what Confirm does on an app selected in the library, taking it out of those selected
+#. Menu item: takes an app out of the apps selected in the library
 #. Menu item: takes an app out of the apps selected in the library
 #: ../../apps/launcher/src/card-menu.tsx
 #: ../../apps/launcher/src/spatial.ts

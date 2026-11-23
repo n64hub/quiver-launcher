@@ -1,12 +1,20 @@
 import { describe, expect, it } from "vitest";
 import type { Entry } from "@quiverlauncher/api";
-import { browseShown, hiddenMatches, toggleHidden, type HiddenView } from "./browse-hidden";
+import { browseShown, hiddenMatches, toggleHidden, withHiddenApps, type HiddenView } from "./browse-hidden";
 
 describe("hiding an app from Browse", () => {
   it("hides it, and shows it again the second time", () => {
     const [a, b] = [{ id: "a", slug: "app-a" }, { id: "b", slug: "app-b" }];
     expect(toggleHidden(undefined, a)).toEqual([a]);
     expect(toggleHidden([a, b], a)).toEqual([b]);
+  });
+  it("hides the apps selected, each once, and shows them all again", () => {
+    const [a, b, c] = [{ id: "a", slug: "app-a" }, { id: "b", slug: "app-b" }, { id: "c", slug: "app-c" }];
+    expect(withHiddenApps(undefined, [a, b], true)).toEqual([a, b]);
+    expect(withHiddenApps([a], [a, b, b], true)).toEqual([a, b]);
+    expect(withHiddenApps([a, b, c], [a, c], false)).toEqual([b]);
+    // Only an app's id and slug are kept, not the rest of a catalog entry.
+    expect(withHiddenApps([], [{ ...c, projectName: "C" } as typeof c], true)).toEqual([c]);
   });
 });
 

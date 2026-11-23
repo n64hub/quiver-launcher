@@ -16,10 +16,20 @@ msgstr "\"Runs well\" is the share of players who said it runs well for them."
 msgid "(changed)"
 msgstr "(changed)"
 
+#. placeholder {0}: adding.length
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {# app added to your library.} other {# apps added to your library.}}"
+msgstr "{0, plural, one {# app added to your library.} other {# apps added to your library.}}"
+
 #. placeholder {0}: elsewhere.size
 #: ../../apps/launcher/src/library.tsx
 msgid "{0, plural, one {# app for other platforms isn't shown.} other {# apps for other platforms aren't shown.}}"
 msgstr "{0, plural, one {# app for other platforms isn't shown.} other {# apps for other platforms aren't shown.}}"
+
+#. placeholder {0}: ids.length
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {# app hidden from Browse.} other {# apps hidden from Browse.}}"
+msgstr "{0, plural, one {# app hidden from Browse.} other {# apps hidden from Browse.}}"
 
 #. placeholder {0}: ids.length
 #: ../../apps/launcher/src/library-ticking.tsx
@@ -37,6 +47,11 @@ msgstr "{0, plural, one {# app is still in {1}. New ones go in the new folder.} 
 #: ../../apps/launcher/src/cache-page.tsx
 msgid "{0, plural, one {# app looked at} other {# apps looked at}}"
 msgstr "{0, plural, one {# app looked at} other {# apps looked at}}"
+
+#. placeholder {0}: ids.length
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {# app shows in Browse again.} other {# apps show in Browse again.}}"
+msgstr "{0, plural, one {# app shows in Browse again.} other {# apps show in Browse again.}}"
 
 #. placeholder {0}: ids.length
 #: ../../apps/launcher/src/library-ticking.tsx
@@ -111,6 +126,11 @@ msgstr "{0, plural, one {# of them may keep your saves in its folder. They'll go
 #: ../../apps/launcher/src/library-ticking.tsx
 msgid "{0, plural, one {# of them may keep your saves in its folder. Uninstalling sends them to the trash too.} other {# of them may keep your saves in their folders. Uninstalling sends them to the trash too.}}"
 msgstr "{0, plural, one {# of them may keep your saves in its folder. Uninstalling sends them to the trash too.} other {# of them may keep your saves in their folders. Uninstalling sends them to the trash too.}}"
+
+#. placeholder {0}: add.count
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {Add # to library} other {Add # to library}}"
+msgstr "{0, plural, one {Add # to library} other {Add # to library}}"
 
 #. placeholder {0}: library.apps.length
 #: ../../apps/launcher/src/old-library.tsx
@@ -2695,6 +2715,7 @@ msgid "Don't play yet"
 msgstr "Don't play yet"
 
 #. Button: stops selecting apps in the library
+#. Button: stops selecting apps in the library
 #. Closes a dialog
 #. Closes the thanks after a problem was reported
 #: ../../apps/launcher/src/announcements-ui.tsx
@@ -3300,6 +3321,7 @@ msgstr "Hide dismissed"
 
 #: ../../apps/launcher/src/App.tsx
 #: ../../apps/launcher/src/card-menu.tsx
+#: ../../apps/launcher/src/library-ticking.tsx
 msgid "Hide from Browse"
 msgstr "Hide from Browse"
 
@@ -6326,6 +6348,7 @@ msgstr "See which apps"
 #. Controller hint: what Confirm does on any other control
 #. Controller hint: what Confirm does on any other control
 #. Menu item: selects an app in the library, to change several at once
+#. Menu item: selects an app in the library, to change several at once
 #: ../../apps/launcher/src/card-menu.tsx
 #: ../../apps/launcher/src/spatial.ts
 msgid "Select"
@@ -6551,6 +6574,7 @@ msgstr "Show hidden apps"
 
 #: ../../apps/launcher/src/App.tsx
 #: ../../apps/launcher/src/card-menu.tsx
+#: ../../apps/launcher/src/library-ticking.tsx
 msgid "Show in Browse"
 msgstr "Show in Browse"
 
@@ -7590,6 +7614,7 @@ msgid "Under a minute"
 msgstr "Under a minute"
 
 #. Button on the toast after hiding apps: shows them again, selected
+#. Button on the toast after hiding apps: shows them again, selected
 #: ../../apps/launcher/src/library-ticking.tsx
 msgid "Undo"
 msgstr "Undo"
@@ -7656,6 +7681,7 @@ msgid "Unpin and install {version}"
 msgstr "Unpin and install {version}"
 
 #. Controller hint: what Confirm does on an app selected in the library, taking it out of those selected
+#. Menu item: takes an app out of the apps selected in the library
 #. Menu item: takes an app out of the apps selected in the library
 #: ../../apps/launcher/src/card-menu.tsx
 #: ../../apps/launcher/src/spatial.ts

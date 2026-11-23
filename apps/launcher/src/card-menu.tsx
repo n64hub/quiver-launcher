@@ -107,6 +107,9 @@ function BrowseMenuItems({ entry, onOpen, close, onReadme, onFeedback }: { entry
   const { source } = useAppDetail(entry);
   const hidden = settings.browseHidden?.some((h) => h.id === entry.id);
   const toggle = () => setSettings({ ...settings, browseHidden: toggleHidden(settings.browseHidden, entry) });
+  // In Browse: the first of several apps to add or hide at once (library-ticking.tsx).
+  const tickToggle = useTickToggle();
+  const { ticked } = useTicked([entry.id]);
   const item = (text: string, act: () => void, disabled = false) => (
     <button key={text} type="button" role="menuitem" data-item disabled={disabled} onClick={() => (close(), act())}>
       {text}
@@ -123,6 +126,7 @@ function BrowseMenuItems({ entry, onOpen, close, onReadme, onFeedback }: { entry
       <hr />
       {item(t`Share feedback…`, onFeedback)}
       <hr />
+      {tickToggle && item(ticked ? t({ message: "Unselect", comment: "Menu item: takes an app out of the apps selected in the library" }) : t({ message: "Select", comment: "Menu item: selects an app in the library, to change several at once" }), () => tickToggle([entry.id]))}
       {item(hidden ? t`Show in Browse` : t`Hide from Browse`, toggle)}
     </div>
   );

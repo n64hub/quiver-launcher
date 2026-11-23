@@ -17,10 +17,20 @@ msgstr "«Работает хорошо» — доля игроков, у кот
 msgid "(changed)"
 msgstr "(изменены)"
 
+#. placeholder {0}: adding.length
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {# app added to your library.} other {# apps added to your library.}}"
+msgstr "{0, plural, one {# приложение добавлено в библиотеку.} few {# приложения добавлены в библиотеку.} many {# приложений добавлено в библиотеку.} other {# приложения добавлены в библиотеку.}}"
+
 #. placeholder {0}: elsewhere.size
 #: ../../apps/launcher/src/library.tsx
 msgid "{0, plural, one {# app for other platforms isn't shown.} other {# apps for other platforms aren't shown.}}"
 msgstr "{0, plural, one {# приложение для других платформ не показано.} few {# приложения для других платформ не показаны.} many {# приложений для других платформ не показаны.} other {# приложения для других платформ не показаны.}}"
+
+#. placeholder {0}: ids.length
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {# app hidden from Browse.} other {# apps hidden from Browse.}}"
+msgstr "{0, plural, one {# приложение скрыто из обзора.} few {# приложения скрыты из обзора.} many {# приложений скрыто из обзора.} other {# приложения скрыты из обзора.}}"
 
 #. placeholder {0}: ids.length
 #: ../../apps/launcher/src/library-ticking.tsx
@@ -38,6 +48,11 @@ msgstr "{0, plural, one {# приложение всё ещё в {1}. Новые
 #: ../../apps/launcher/src/cache-page.tsx
 msgid "{0, plural, one {# app looked at} other {# apps looked at}}"
 msgstr "{0, plural, one {Просмотрено # приложение} few {Просмотрено # приложения} many {Просмотрено # приложений} other {Просмотрено # приложения}}"
+
+#. placeholder {0}: ids.length
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {# app shows in Browse again.} other {# apps show in Browse again.}}"
+msgstr "{0, plural, one {# приложение снова видно в обзоре.} few {# приложения снова видны в обзоре.} many {# приложений снова видны в обзоре.} other {# приложения снова видны в обзоре.}}"
 
 #. placeholder {0}: ids.length
 #: ../../apps/launcher/src/library-ticking.tsx
@@ -112,6 +127,11 @@ msgstr "{0, plural, one {# из них, возможно, хранит сохр�
 #: ../../apps/launcher/src/library-ticking.tsx
 msgid "{0, plural, one {# of them may keep your saves in its folder. Uninstalling sends them to the trash too.} other {# of them may keep your saves in their folders. Uninstalling sends them to the trash too.}}"
 msgstr "{0, plural, one {# из них может хранить ваши сохранения в своей папке. При удалении они тоже попадут в корзину.} few {# из них могут хранить ваши сохранения в своих папках. При удалении они тоже попадут в корзину.} many {# из них могут хранить ваши сохранения в своих папках. При удалении они тоже попадут в корзину.} other {# из них могут хранить ваши сохранения в своих папках. При удалении они тоже попадут в корзину.}}"
+
+#. placeholder {0}: add.count
+#: ../../apps/launcher/src/library-ticking.tsx
+msgid "{0, plural, one {Add # to library} other {Add # to library}}"
+msgstr "{0, plural, one {Добавить # в библиотеку} few {Добавить # в библиотеку} many {Добавить # в библиотеку} other {Добавить # в библиотеку}}"
 
 #. placeholder {0}: library.apps.length
 #: ../../apps/launcher/src/old-library.tsx
@@ -2696,6 +2716,7 @@ msgid "Don't play yet"
 msgstr "Пока не играть"
 
 #. Button: stops selecting apps in the library
+#. Button: stops selecting apps in the library
 #. Closes a dialog
 #. Closes the thanks after a problem was reported
 #: ../../apps/launcher/src/announcements-ui.tsx
@@ -3301,6 +3322,7 @@ msgstr "Не показывать скрытые"
 
 #: ../../apps/launcher/src/App.tsx
 #: ../../apps/launcher/src/card-menu.tsx
+#: ../../apps/launcher/src/library-ticking.tsx
 msgid "Hide from Browse"
 msgstr "Скрыть из обзора"
 
@@ -6327,6 +6349,7 @@ msgstr "Посмотреть, какие приложения"
 #. Controller hint: what Confirm does on any other control
 #. Controller hint: what Confirm does on any other control
 #. Menu item: selects an app in the library, to change several at once
+#. Menu item: selects an app in the library, to change several at once
 #: ../../apps/launcher/src/card-menu.tsx
 #: ../../apps/launcher/src/spatial.ts
 msgid "Select"
@@ -6552,6 +6575,7 @@ msgstr "Показывать скрытые приложения"
 
 #: ../../apps/launcher/src/App.tsx
 #: ../../apps/launcher/src/card-menu.tsx
+#: ../../apps/launcher/src/library-ticking.tsx
 msgid "Show in Browse"
 msgstr "Показать в обзоре"
 
@@ -7591,6 +7615,7 @@ msgid "Under a minute"
 msgstr "Меньше минуты"
 
 #. Button on the toast after hiding apps: shows them again, selected
+#. Button on the toast after hiding apps: shows them again, selected
 #: ../../apps/launcher/src/library-ticking.tsx
 msgid "Undo"
 msgstr "Отменить"
@@ -7657,6 +7682,7 @@ msgid "Unpin and install {version}"
 msgstr "Открепить и установить {version}"
 
 #. Controller hint: what Confirm does on an app selected in the library, taking it out of those selected
+#. Menu item: takes an app out of the apps selected in the library
 #. Menu item: takes an app out of the apps selected in the library
 #: ../../apps/launcher/src/card-menu.tsx
 #: ../../apps/launcher/src/spatial.ts

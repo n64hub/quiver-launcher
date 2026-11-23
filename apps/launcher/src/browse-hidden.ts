@@ -13,6 +13,13 @@ export type HiddenApp = { id: string; slug: string };
 export const toggleHidden = (hidden: readonly HiddenApp[] | undefined, { id, slug }: HiddenApp): HiddenApp[] =>
   hidden?.some((h) => h.id === id) ? hidden.filter((h) => h.id !== id) : [...(hidden ?? []), { id, slug }];
 
+/** `hidden` with all these apps hidden (`on`), each once, or all of them shown again: the apps selected in Browse. */
+export function withHiddenApps(hidden: readonly HiddenApp[] | undefined, apps: readonly HiddenApp[], on: boolean): HiddenApp[] {
+  const now = hidden ?? [];
+  if (!on) return now.filter((h) => !apps.some((a) => a.id === h.id));
+  return [...now, ...apps.filter((a, i) => !now.some((h) => h.id === a.id) && apps.findIndex((b) => b.id === a.id) === i).map(({ id, slug }) => ({ id, slug }))];
+}
+
 const words = (text: string) => text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
 
 /** Only hidden apps' own search and filters, there being no catalog page to ask: as the site's, every typed word starts a word of the name. */
