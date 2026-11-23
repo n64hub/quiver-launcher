@@ -136,3 +136,14 @@ test("the window's buttons stay in the corner of a bar still too wide", async ()
     await opened.close();
   }
 });
+
+test("Browse's tab counts the apps in the whole catalog, as Library's counts the library", async () => {
+  const opened = await openApp();
+  try {
+    const { total } = await (await fetch(`${opened.api.api}/facets`)).json();
+    assert.ok(total > 0);
+    await opened.page.locator(".topbar nav button", { hasText: "Browse" }).locator(".count").getByText(String(total), { exact: true }).waitFor();
+  } finally {
+    await opened.close();
+  }
+});

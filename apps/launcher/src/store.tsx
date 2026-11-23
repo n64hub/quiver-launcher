@@ -257,6 +257,8 @@ type Launcher = {
   /** The catalog's consoles, and their names by id. */
   consoles: Console[];
   consoleNames: Record<string, string>;
+  /** How many apps the whole catalog has, as Browse's tab shows; undefined until the site answers. */
+  catalogTotal?: number;
   /** An entry from the site (Browse's, or a game's ports) less the tags hidden here, as `catalog`'s are. */
   withShownTags: <E extends Pick<Entry, "id" | "tags">>(entry: E) => E;
   library: LibraryItem[];
@@ -1721,7 +1723,8 @@ function LauncherState({ saved, children }: { saved: Saved; children: ReactNode 
   /** A custom app's releases, newest first. */
   const releasesOf = (app: Pick<CustomApp, "provider" | "host" | "repository">) => providers.releases(app);
   const [consoles, setConsoles] = useState<Console[]>([]);
-  useEffect(() => void client.facets().then((f) => setConsoles(f.consoles), () => {}), [client]);
+  const [catalogTotal, setCatalogTotal] = useState<number>();
+  useEffect(() => void client.facets().then((f) => { setConsoles(f.consoles); setCatalogTotal(f.total); }, () => {}), [client]);
   const consoleNames = useMemo(() => Object.fromEntries(consoles.map((c) => [c.id, c.name])), [consoles]);
   const [allCollections, setCollections] = useState(saved.collections);
   const collections = useMemo(() => allCollections.filter((c) => !c.removed).sort((a, b) => a.order - b.order), [allCollections]);
@@ -2780,6 +2783,7 @@ function LauncherState({ saved, children }: { saved: Saved; children: ReactNode 
     providers,
     consoles,
     consoleNames,
+    catalogTotal,
     withShownTags,
     collections,
     saveCollection: (c) => {
